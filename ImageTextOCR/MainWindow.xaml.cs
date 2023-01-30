@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace ImageTextOCR
 {
@@ -76,31 +77,35 @@ namespace ImageTextOCR
             GetInfo(files);
         }
 
-        private void GetInfo(List<FileInfo> files, int number = 1, int imagesNumber = 0)
+        private void GetInfo(List<FileInfo> files)
         {
             var detailsText = DetailsBox.Text + "\n\n";
-            foreach (var file in files)
+            var imageCount = 0;
+            var sw = new Stopwatch();
+            sw.Start();
+            Parallel.ForEach(files, ExtractText);
+            sw.Stop();
+            DetailsBox.Text += $"\n\nComplited! Extract Time: {sw.ElapsedMilliseconds / 1000} seconds";
+        }
+
+        private void ExtractText(FileInfo file)
+        {
+            if (SupportedExtensions.Contains(file.Extension))
             {
-                if (SupportedExtensions.Contains(file.Extension))
+                var fileInfo = new FileInfo(file.FullName);
+                if (fileInfo.DirectoryName != null)
                 {
-                    var fileInfo = new FileInfo(file.FullName);
-                    if (fileInfo.DirectoryName != null)
+                    var imageInfo = new ImageInfo(fileInfo.FullName);
+                    var saveDirectory = fileInfo.DirectoryName + Path.DirectorySeparatorChar + "ExtractedText" + Path.DirectorySeparatorChar;
+                    if (!Directory.Exists(saveDirectory))
+                        Directory.CreateDirectory(saveDirectory);
+                    var textFile = saveDirectory + fileInfo.Name.Split('.')[0] + ".txt";
+                    using (StreamWriter writer = new StreamWriter(textFile, false, System.Text.Encoding.Default))
                     {
-                        var imageInfo = new ImageInfo(fileInfo.FullName);
-                        var saveDirectory = fileInfo.DirectoryName + Path.DirectorySeparatorChar + "ExtractedText" + Path.DirectorySeparatorChar;
-                        if (!Directory.Exists(saveDirectory))
-                            Directory.CreateDirectory(saveDirectory);
-                        var textFile = saveDirectory + fileInfo.Name.Split('.')[0] + ".txt";
-                        using (StreamWriter writer = new StreamWriter(textFile, false, System.Text.Encoding.Default))
-                        {
-                            writer.WriteLine(imageInfo.Text);
-                        }
-                        imagesNumber++;
+                        writer.WriteLine(imageInfo.Text);
                     }
                 }
-                DetailsBox.Text = $"{detailsText} {number++} of {files.Count} ({imagesNumber} of them are images)";
             }
-            DetailsBox.Text += "\n\nComplited!";
         }
     }
 }
