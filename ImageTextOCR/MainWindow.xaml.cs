@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.IO;
 
@@ -82,14 +81,16 @@ namespace ImageTextOCR
             var detailsText = DetailsBox.Text + "\n\n";
             foreach (var file in files)
             {
-                DetailsBox.Text = $"{detailsText} {number} of {files.Count} ({imagesNumber} of them are images)";
                 if (SupportedExtensions.Contains(file.Extension))
                 {
                     var fileInfo = new FileInfo(file.FullName);
                     if (fileInfo.DirectoryName != null)
                     {
                         var imageInfo = new ImageInfo(fileInfo.FullName);
-                        var textFile = fileInfo.DirectoryName + "\\" + fileInfo.Name.Split('.')[0] + ".txt";
+                        var saveDirectory = fileInfo.DirectoryName + Path.DirectorySeparatorChar + "ExtractedText" + Path.DirectorySeparatorChar;
+                        if (!Directory.Exists(saveDirectory))
+                            Directory.CreateDirectory(saveDirectory);
+                        var textFile = saveDirectory + fileInfo.Name.Split('.')[0] + ".txt";
                         using (StreamWriter writer = new StreamWriter(textFile, false, System.Text.Encoding.Default))
                         {
                             writer.WriteLine(imageInfo.Text);
@@ -97,7 +98,7 @@ namespace ImageTextOCR
                         imagesNumber++;
                     }
                 }
-                number++;
+                DetailsBox.Text = $"{detailsText} {number++} of {files.Count} ({imagesNumber} of them are images)";
             }
             DetailsBox.Text += "\n\nComplited!";
         }
