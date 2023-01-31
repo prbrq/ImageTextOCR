@@ -22,7 +22,7 @@ namespace ImageTextOCR
     /// </summary>
     public partial class MainWindow : Window
     {
-        public string SelectedPath { get; private set; }
+        public string? SelectedPath { get; private set; }
 
         public MainWindow()
         {
@@ -37,6 +37,7 @@ namespace ImageTextOCR
             {
                 SelectedPath = openFileDialog.FileName;
                 DetailsBox.Text = $"File selected:\n{SelectedPath}";
+                GetInfoButton.IsEnabled = true;
             }
         }
 
@@ -47,24 +48,31 @@ namespace ImageTextOCR
             {
                 SelectedPath = folderBrowserDialog.SelectedPath + "\\";
                 DetailsBox.Text = $"Folder selected:\n{SelectedPath}";
+                GetInfoButton.IsEnabled = true;
             }
         }
 
         private void GetInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            var files = new List<FileInfo>();
-            var path = SelectedPath;
-            if (path.EndsWith('\\'))
+            if (String.IsNullOrEmpty(SelectedPath))
             {
-                var dirInfo = new DirectoryInfo(path);
-                var info = dirInfo.GetFiles();
-                files.AddRange(info);
+                throw new ArgumentException("To extract the text, the path must be selected");
             }
             else
             {
-               files.Add(new FileInfo(path));
+                var files = new List<FileInfo>();
+                if (SelectedPath.EndsWith('\\'))
+                {
+                    var dirInfo = new DirectoryInfo(SelectedPath);
+                    var info = dirInfo.GetFiles();
+                    files.AddRange(info);
+                }
+                else
+                {
+                    files.Add(new FileInfo(SelectedPath));
+                }
+                GetInfo(files);
             }
-            GetInfo(files);
         }
 
         private void GetInfo(List<FileInfo> files)
