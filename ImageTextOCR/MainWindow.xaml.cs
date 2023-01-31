@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ImageTextOCR
 {
@@ -46,13 +47,13 @@ namespace ImageTextOCR
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
             if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                SelectedPath = folderBrowserDialog.SelectedPath + "\\";
+                SelectedPath = folderBrowserDialog.SelectedPath + Path.DirectorySeparatorChar;
                 DetailsBox.Text = $"Folder selected:\n{SelectedPath}";
                 GetInfoButton.IsEnabled = true;
             }
         }
 
-        private void GetInfoButton_Click(object sender, RoutedEventArgs e)
+        private void ExtractTextButton_Click(object sender, RoutedEventArgs e)
         {
             if (String.IsNullOrEmpty(SelectedPath))
             {
@@ -61,47 +62,45 @@ namespace ImageTextOCR
             else
             {
                 var files = new List<FileInfo>();
-                if (SelectedPath.EndsWith('\\'))
+                if (SelectedPath.EndsWith(Path.DirectorySeparatorChar))
                 {
-                    var dirInfo = new DirectoryInfo(SelectedPath);
-                    var info = dirInfo.GetFiles();
-                    files.AddRange(info);
+                    var directoryInfo = new DirectoryInfo(SelectedPath);
+                    var directoryFiles = directoryInfo.GetFiles();
+                    files.AddRange(directoryFiles);
                 }
                 else
                 {
                     files.Add(new FileInfo(SelectedPath));
                 }
-                GetInfo(files);
+                files = files.Where(file => SupportedExtensions.Extensions.Contains(file.Extension)).ToList();
+                DetailsBox.Text += $"\nNumber of files: {files.Count}";
+                var separateThread = new Thread(() => ProcessFiles(files));
+                separateThread.Start();
             }
         }
 
-        private void GetInfo(List<FileInfo> files)
+        private void ProcessFiles(List<FileInfo> files)
         {
-            var detailsText = DetailsBox.Text + "\n\n";
-            var sw = new Stopwatch();
-            sw.Start();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             Parallel.ForEach(files, ExtractText);
-            sw.Stop();
-            DetailsBox.Text += $"\n\nComplited! Extract Time: {sw.ElapsedMilliseconds / 1000} seconds";
+            stopwatch.Stop();
+            Dispatcher.Invoke(() =>
+            {
+                DetailsBox.Text += $"\n\nComplited! Extract Time: {stopwatch.ElapsedMilliseconds / 1000} seconds";
+            });
         }
 
         private void ExtractText(FileInfo file)
         {
-            if (SupportedExtensions.Extensions.Contains(file.Extension))
+            var imageInfo = new ImageInfo(file.FullName);
+            var saveDirectory = file.DirectoryName + Path.DirectorySeparatorChar + "ExtractedText" + Path.DirectorySeparatorChar;
+            if (!Directory.Exists(saveDirectory))
+                Directory.CreateDirectory(saveDirectory);
+            var textFile = saveDirectory + file.Name.Split('.')[0] + ".txt";
+            using (StreamWriter writer = new StreamWriter(textFile, false, Encoding.Default))
             {
-                var fileInfo = new FileInfo(file.FullName);
-                if (fileInfo.DirectoryName != null)
-                {
-                    var imageInfo = new ImageInfo(fileInfo.FullName);
-                    var saveDirectory = fileInfo.DirectoryName + Path.DirectorySeparatorChar + "ExtractedText" + Path.DirectorySeparatorChar;
-                    if (!Directory.Exists(saveDirectory))
-                        Directory.CreateDirectory(saveDirectory);
-                    var textFile = saveDirectory + fileInfo.Name.Split('.')[0] + ".txt";
-                    using (StreamWriter writer = new StreamWriter(textFile, false, System.Text.Encoding.Default))
-                    {
-                        writer.WriteLine(imageInfo.Text);
-                    }
-                }
+                writer.WriteLine(imageInfo.Text);
             }
         }
     }

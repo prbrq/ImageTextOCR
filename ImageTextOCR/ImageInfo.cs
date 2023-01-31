@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -16,12 +17,13 @@ namespace ImageTextOCR
                 Language.English,
                 Language.Russian,
             };
+
         public string FileName { get; private set; }
         public float MeanConfidence { get; private set; }
         public string Text { get; private set; }
 
         public ImageInfo(string fileName)
-        { 
+        {
             FileName = fileName;
             Text = string.Empty;
             GetData();
@@ -29,8 +31,7 @@ namespace ImageTextOCR
 
         private void GetData()
         {
-
-            using (var engine = new Engine(@"./tessdata", languages, EngineMode.Default))
+            using (var engine = new Engine($".{Path.DirectorySeparatorChar}tessdata", languages, EngineMode.Default))
             {
                 using (var image = TesseractOCR.Pix.Image.LoadFromFile(FileName))
                 {
@@ -39,6 +40,7 @@ namespace ImageTextOCR
                         MeanConfidence = page.MeanConfidence;
                         Text = page.Text;
                     }
+                    engine.Dispose();
                 }
             }
         }
