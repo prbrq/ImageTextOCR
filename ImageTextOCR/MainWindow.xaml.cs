@@ -38,7 +38,7 @@ namespace ImageTextOCR
             {
                 SelectedPath = openFileDialog.FileName;
                 DetailsBox.Text = $"File selected:\n{SelectedPath}";
-                GetInfoButton.IsEnabled = true;
+                ExtractTextButton.IsEnabled = true;
             }
         }
 
@@ -49,7 +49,7 @@ namespace ImageTextOCR
             {
                 SelectedPath = folderBrowserDialog.SelectedPath + Path.DirectorySeparatorChar;
                 DetailsBox.Text = $"Folder selected:\n{SelectedPath}";
-                GetInfoButton.IsEnabled = true;
+                ExtractTextButton.IsEnabled = true;
             }
         }
 
@@ -73,9 +73,10 @@ namespace ImageTextOCR
                     files.Add(new FileInfo(SelectedPath));
                 }
                 files = files.Where(file => SupportedExtensions.Extensions.Contains(file.Extension)).ToList();
-                DetailsBox.Text += $"\nNumber of files: {files.Count}";
+                DetailsBox.Text += $"\n\nNumber of files: {files.Count}\n\nPlease, wait...";
                 var separateThread = new Thread(() => ProcessFiles(files));
                 separateThread.Start();
+                ExtractTextButton.IsEnabled = false;
             }
         }
 
@@ -87,7 +88,7 @@ namespace ImageTextOCR
             stopwatch.Stop();
             Dispatcher.Invoke(() =>
             {
-                DetailsBox.Text += $"\n\nComplited! Extract Time: {stopwatch.ElapsedMilliseconds / 1000} seconds";
+                DetailsBox.Text += $"\n\nComplited! Extract Time: {stopwatch.ElapsedMilliseconds / (double)1000} seconds";
             });
         }
 

@@ -40,7 +40,6 @@ namespace ImageTextOCR
                         MeanConfidence = page.MeanConfidence;
                         Text = page.Text;
                     }
-                    engine.Dispose();
                 }
             }
         }
