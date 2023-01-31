@@ -22,7 +22,6 @@ namespace ImageTextOCR
     /// </summary>
     public partial class MainWindow : Window
     {
-        public string[] SupportedExtensions { get; } = new string[] { ".jpg", "jpeg", ".png", ".bmp" };
         public string SelectedPath { get; private set; }
 
         public MainWindow()
@@ -33,21 +32,12 @@ namespace ImageTextOCR
         private void FilePathButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = $"Image Files|{GetExtensionsFilter(SupportedExtensions)}";
+            openFileDialog.Filter = $"Image Files|{SupportedExtensions.ExplorerFilter}";
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 SelectedPath = openFileDialog.FileName;
                 DetailsBox.Text = $"File selected:\n{SelectedPath}";
             }
-        }
-
-        private string GetExtensionsFilter(string[] SupportedExtensions)
-        {
-            var result = String.Concat(SupportedExtensions.SelectMany(extension => "*" + extension + ";"));
-            if (String.IsNullOrEmpty(result))
-                throw new ArgumentException("Extensions are configured incorrectly");
-            else
-                return result;
         }
 
         private void FolderPathButton_Click(object sender, RoutedEventArgs e)
@@ -80,7 +70,6 @@ namespace ImageTextOCR
         private void GetInfo(List<FileInfo> files)
         {
             var detailsText = DetailsBox.Text + "\n\n";
-            var imageCount = 0;
             var sw = new Stopwatch();
             sw.Start();
             Parallel.ForEach(files, ExtractText);
@@ -90,7 +79,7 @@ namespace ImageTextOCR
 
         private void ExtractText(FileInfo file)
         {
-            if (SupportedExtensions.Contains(file.Extension))
+            if (SupportedExtensions.Extensions.Contains(file.Extension))
             {
                 var fileInfo = new FileInfo(file.FullName);
                 if (fileInfo.DirectoryName != null)
