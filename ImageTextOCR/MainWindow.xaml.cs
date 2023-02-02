@@ -18,9 +18,6 @@ using System.Threading;
 
 namespace ImageTextOCR
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public string? SelectedPath { get; private set; }
@@ -28,6 +25,15 @@ namespace ImageTextOCR
         public MainWindow()
         {
             InitializeComponent();
+            if (DownloadedLanguages.Languages.Count == 0)
+                BlockApp("You need language data in root directory.");
+        }
+
+        private void BlockApp(string message)
+        {
+            DetailsBox.Text = $"{message}\nPlease check the project page on GitHub.";
+            FilePathButton.IsEnabled = false;
+            FolderPathButton.IsEnabled = false;
         }
 
         private void FilePathButton_Click(object sender, RoutedEventArgs e)

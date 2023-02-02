@@ -25,7 +25,7 @@ namespace ImageTextOCR
 
         private void GetData()
         {
-            using (var engine = new Engine($".{Path.DirectorySeparatorChar}tessdata", SupportedLanguages.Languages, EngineMode.Default))
+            using (var engine = new Engine($".", DownloadedLanguages.Languages, EngineMode.Default))
             {
                 using (var image = TesseractOCR.Pix.Image.LoadFromFile(FileName))
                 {
