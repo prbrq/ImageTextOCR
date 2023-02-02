@@ -12,12 +12,6 @@ namespace ImageTextOCR
 {
     public class ImageInfo
     {
-        static List<Language> languages = new List<Language>()
-            {
-                Language.English,
-                Language.Russian,
-            };
-
         public string FileName { get; private set; }
         public float MeanConfidence { get; private set; }
         public string Text { get; private set; }
@@ -31,7 +25,7 @@ namespace ImageTextOCR
 
         private void GetData()
         {
-            using (var engine = new Engine($".{Path.DirectorySeparatorChar}tessdata", languages, EngineMode.Default))
+            using (var engine = new Engine($".{Path.DirectorySeparatorChar}tessdata", SupportedLanguages.Languages, EngineMode.Default))
             {
                 using (var image = TesseractOCR.Pix.Image.LoadFromFile(FileName))
                 {
