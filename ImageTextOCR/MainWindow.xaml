@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageTextOCR"
         mc:Ignorable="d"
-        Title="ImageTextOCR" Height="450" Width="1000">
+        Title="ImageTextOCR" Height="450" Width="800" MinHeight="300" MinWidth="400">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -14,10 +14,11 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="DetailsBox" HorizontalAlignment="Center" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="480" Height="415" IsEnabled="False" Margin="0,10,0,0" Grid.RowSpan="2"/>
-        <Button x:Name="FilePathButton" Content="Select File" HorizontalAlignment="Center" VerticalAlignment="Top" Click="FilePathButton_Click" Grid.Column="1" Width="380" Margin="0,10,0,0" Height="94"/>
-        <Button x:Name="FolderPathButton" Grid.Column="1" Content="Select Folder" HorizontalAlignment="Center" Margin="0,109,0,0" VerticalAlignment="Top" Width="380" Height="98" Click="FolderPathButton_Click"/>
-        <Button x:Name="ExtractTextButton" Grid.Column="1" Content="Extract Text" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Width="480" Height="198" Click="ExtractTextButton_Click" IsEnabled="False"/>
+        <TextBox x:Name="DetailsBox" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Stretch" IsEnabled="False" Grid.RowSpan="3" Margin="10" FontSize="16"/>
+        <Button x:Name="FilePathButton" Grid.Column="1" Content="Select File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="FilePathButton_Click" Margin="10" FontSize="24"/>
+        <Button x:Name="FolderPathButton" Grid.Column="1" Grid.Row="1" Content="Select Folder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="FolderPathButton_Click" Margin="10" FontSize="24"/>
+        <Button x:Name="ExtractTextButton" Grid.Column="1" Grid.Row="2" Content="Extract Text" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ExtractTextButton_Click" Margin="10" IsEnabled="False" FontSize="24"/>
     </Grid>
 </Window>
