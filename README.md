@@ -1,4 +1,5 @@
 # ImageTextOCR
+[![Screenshot](GitHub/b8gKg1yBP2.gif)]
 ImageTextOCR - is a free and open-source text extractor for Windows. ImageTextOCR is based on OCR from Google.
 ## Downloads
 You can download ImageTextOCR from [here](https://github.com/prbrq/ImageTextOCR/releases/download/v1.0.0/ImageTextOCR.zip).
